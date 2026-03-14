@@ -1,0 +1,105 @@
+sub get_parsed_useragent STRING {
+  declare local var.result STRING;
+  set req.http.uap = "";
+
+  {% for parser in user_agent_parsers -%}
+  if (req.http.user-agent ~ "{{ parser.regex | escape_vcl_regex }}") {
+    {% if parser.family_replacement -%}
+      set req.http.uap:family = {"{{ parser.family_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:family = re.group.1;
+    {%- endif %}
+    {% if parser.v1_replacement -%}
+      set req.http.uap:major = {"{{ parser.v1_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:major = re.group.2;
+    {%- endif %}
+    {% if parser.v2_replacement -%}
+      set req.http.uap:minor = {"{{ parser.v2_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:minor = re.group.3;
+    {%- endif %}
+    {% if parser.v3_replacement -%}
+      set req.http.uap:patch = {"{{ parser.v3_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:patch = re.group.4;
+    {%- endif %}
+  } else
+  {% endfor -%}
+  {}
+
+  set var.result = req.http.uap;
+  unset req.http.uap;
+
+  return var.result;
+}
+
+sub get_useragent_os STRING {
+  declare local var.result STRING;
+  set req.http.uap = "";
+
+  {% for parser in os_parsers -%}
+  if (req.http.user-agent ~ "{{ parser.regex | escape_vcl_regex }}") {
+    {% if parser.os_replacement -%}
+      set req.http.uap:family = {"{{ parser.os_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:family = re.group.1;
+    {%- endif %}
+    {% if parser.os_v1_replacement -%}
+      set req.http.uap:major = {"{{ parser.os_v1_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:major = re.group.2;
+    {%- endif %}
+    {% if parser.os_v2_replacement -%}
+      set req.http.uap:minor = {"{{ parser.os_v2_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:minor = re.group.3;
+    {%- endif %}
+    {% if parser.os_v3_replacement -%}
+      set req.http.uap:patch = {"{{ parser.os_v3_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:patch = re.group.4;
+    {%- endif %}
+    {% if parser.os_v4_replacement -%}
+      set req.http.uap:patchMinor = {"{{ parser.os_v4_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:patchMinor = re.group.5;
+    {%- endif %}
+  } else
+  {% endfor -%}
+  {}
+
+  set var.result = req.http.uap;
+  unset req.http.uap;
+
+  return var.result;
+}
+
+sub get_useragent_device STRING {
+  declare local var.result STRING;
+  set req.http.uap = "";
+
+  {% for parser in device_parsers -%}
+  if (req.http.user-agent ~ "{{ parser.regex | escape_vcl_regex }}") {
+    {% if parser.device_replacement -%}
+      set req.http.uap:family = {"{{ parser.device_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:family = re.group.1;
+    {%- endif %}
+    {% if parser.brand_replacement -%}
+      set req.http.uap:brand = {"{{ parser.brand_replacement | to_vcl_replacement }}"};
+    {%- endif %}
+    {% if parser.model_replacement -%}
+      set req.http.uap:model = {"{{ parser.model_replacement | to_vcl_replacement }}"};
+    {%- else -%}
+      set req.http.uap:model = re.group.1;
+    {%- endif %}
+  } else
+  {% endfor -%}
+  {}
+
+  set var.result = req.http.uap;
+  unset req.http.uap;
+
+  return var.result;
+}

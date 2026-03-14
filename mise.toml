@@ -1,0 +1,27 @@
+[tools]
+"aqua:ysugimoto/falco" = "2.0.1"
+go = "1.26.1"
+node = "24.14.0"
+"npm:pnpm" = "10.32.1"
+
+[env]
+_.path = ['{{ config_root }}/node_modules/.bin']
+
+[tasks."setup"]
+run = """
+pnpm install --frozen-lockfile
+"""
+
+[tasks.build]
+depends = ["build:*"]
+
+[tasks."build:liquid"]
+run = """
+tsx ./scripts/build.ts
+"""
+
+[tasks."build:falco-fmt"]
+run = """
+falco fmt --write ./useragent-parser.vcl
+"""
+depends = ["build:liquid"]
